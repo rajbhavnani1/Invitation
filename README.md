@@ -1,1 +1,363 @@
-# Invitation
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>A Special Invitation 💛</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,500&family=Nunito:wght@400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fef9ee;
+    font-family: 'Nunito', sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Soft background blobs */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width: 380px; height: 380px; background: #f9c46b; top: -80px; left: -100px; }
+  .blob-2 { width: 300px; height: 300px; background: #f28c72; bottom: -60px; right: -80px; }
+  .blob-3 { width: 220px; height: 220px; background: #a8d8b0; bottom: 40px; left: 30%; }
+
+  /* Card */
+  .card {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: 0 12px 50px rgba(0,0,0,0.08);
+    padding: 52px 44px 48px;
+    max-width: 540px;
+    width: 90%;
+    text-align: center;
+    animation: cardIn 0.7s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardIn {
+    from { opacity:0; transform: translateY(30px) scale(.96); }
+    to   { opacity:1; transform: translateY(0)    scale(1);   }
+  }
+
+  .emoji-top { font-size: 42px; margin-bottom: 6px; display: block;
+    animation: wiggle 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes wiggle {
+    0%   { transform: rotate(-8deg); }
+    100% { transform: rotate(8deg);  }
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    color: #3d3025;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  h1 em { font-style: italic; color: #e8825a; }
+
+  .sub {
+    color: #8a7e6e;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  /* Details grid */
+  .details {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .detail-item {
+    background: #fdf5e8;
+    border-radius: 16px;
+    padding: 14px 18px;
+    flex: 1 1 120px;
+    max-width: 180px;
+  }
+  .detail-item .label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #b09a7e;
+    margin-bottom: 4px;
+  }
+  .detail-item .value {
+    font-weight: 700;
+    color: #3d3025;
+    font-size: 0.92rem;
+  }
+
+  /* Buttons row */
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    min-height: 100px;
+  }
+
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 34px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Yes button */
+  .btn-yes {
+    background: linear-gradient(135deg, #f9c46b, #f28c72);
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(242,140,114,.4);
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .btn-yes:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 26px rgba(242,140,114,.5);
+  }
+  .btn-yes:active { transform: scale(1.04); }
+
+  /* No button – runs away! No transition so it JUMPS instantly */
+  .btn-no {
+    background: #eee8df;
+    color: #8a7e6e;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    position: absolute;
+    z-index: 10;
+    /* left/top set by JS */
+  }
+
+  /* Confetti & success overlay */
+  .success-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(253,245,232,.95);
+    z-index: 100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    animation: fadeIn .4s ease;
+  }
+  .success-overlay.show { display: flex; }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  .success-overlay .big-emoji { font-size: 72px; margin-bottom: 12px;
+    animation: pop .5s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+  .success-overlay h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #3d3025;
+    margin-bottom: 8px;
+  }
+  .success-overlay p {
+    color: #8a7e6e;
+    font-size: 1rem;
+    max-width: 340px;
+  }
+
+  /* Confetti canvas */
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 99; }
+
+  /* Paw prints scattered */
+  .paw {
+    position: absolute;
+    font-size: 18px;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- Scattered paw prints for charm -->
+<div class="paw" style="top:8%;left:6%;">🐾</div>
+<div class="paw" style="top:15%;right:8%;">🐾</div>
+<div class="paw" style="bottom:12%;left:12%;">🐾</div>
+<div class="paw" style="bottom:18%;right:5%;">🐾</div>
+
+<canvas id="confetti"></canvas>
+
+<!-- Main card -->
+<div class="card">
+  <span class="emoji-top">🏡</span>
+  <h1>Hey <em>Lack Toast</em>!<br/>Please come to Dhule 🥺</h1>
+  <p class="sub">
+    It's going to be so much fun, I promise! We're gonna have the most amazing food —
+    think soothing, relaxing, good vibes all around. And hey…
+    maybe we can even hit up a <strong style="color:#e8825a;">Nashik trek on Saturday?! 🥾</strong>
+  </p>
+
+  <div class="details">
+    <div class="detail-item">
+      <div class="label">📍 Where</div>
+      <div class="value">Dhule, Maharashtra</div>
+    </div>
+    <div class="detail-item">
+      <div class="label">🍜 The Plan</div>
+      <div class="value">Amazing food + good vibes</div>
+    </div>
+    <div class="detail-item">
+      <div class="label">🥾 Bonus</div>
+      <div class="value">Nashik Trek on Saturday!</div>
+    </div>
+  </div>
+
+  <div class="btn-row" id="btnRow">
+    <button class="btn btn-yes" onclick="onYes()">Yes, let's go! 🎉</button>
+  </div>
+  <!-- No button is OUTSIDE btn-row, direct child of .card so absolute pos works vs the card -->
+  <button class="btn btn-no" id="btnNo">No</button>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="big-emoji">🥳</div>
+  <h2>Yayy!! See you in Dhule, Lack Toast!</h2>
+  <p>Get ready for insane food, good vibes, and maybe even that Nashik trek on Saturday! Can't wait!! 💛🥾</p>
+</div>
+
+<script>
+  const btnNo = document.getElementById('btnNo');
+  const card  = document.querySelector('.card');
+
+  // Track raw mouse position globally
+  let mouseX = -999, mouseY = -999;
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  // Place the No button at a nice starting spot (bottom-right of card)
+  function initNoBtn() {
+    const cr = card.getBoundingClientRect();
+    btnNo.style.left = (cr.width * 0.62) + 'px';
+    btnNo.style.top  = (cr.height - 60)  + 'px';
+  }
+  initNoBtn();
+  window.addEventListener('resize', initNoBtn);
+
+  // Continuous loop — every frame, check distance and flee if close
+  function loop() {
+    const cr = card.getBoundingClientRect();
+
+    // Mouse position relative to card
+    const mx = mouseX - cr.left;
+    const my = mouseY - cr.top;
+
+    // Button center relative to card
+    const br  = btnNo.getBoundingClientRect();
+    const bx  = br.left + br.width  / 2 - cr.left;
+    const by  = br.top  + br.height / 2 - cr.top;
+
+    // Distance
+    const dx   = bx - mx;
+    const dy   = by - my;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    // Flee if mouse is within 140px
+    if (dist < 140 && dist > 0) {
+      const angle = Math.atan2(dy, dx);  // direction AWAY from mouse
+      const jump  = 120 + Math.random() * 80;
+
+      let nx = bx + Math.cos(angle) * jump;
+      let ny = by + Math.sin(angle) * jump;
+
+      // Clamp inside card boundaries
+      const pad = btnNo.offsetWidth / 2 + 8;
+      nx = Math.max(pad, Math.min(cr.width  - pad, nx));
+      ny = Math.max(pad, Math.min(cr.height - pad, ny));
+
+      btnNo.style.left = nx + 'px';
+      btnNo.style.top  = ny + 'px';
+    }
+
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // Safety net: block any click on No
+  btnNo.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+
+  // ── Yes button ──
+  function onYes() {
+    document.getElementById('successOverlay').classList.add('show');
+    launchConfetti();
+  }
+
+  // ── Confetti ──
+  function launchConfetti() {
+    const canvas  = document.getElementById('confetti');
+    const ctx     = canvas.getContext('2d');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const pieces = [];
+    const colors = ['#f9c46b','#f28c72','#a8d8b0','#e88fa2','#7fc8e0','#c9b8f0'];
+
+    for (let i = 0; i < 140; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: -Math.random() * canvas.height * 0.4,
+        w: 6 + Math.random() * 6,
+        h: 4 + Math.random() * 4,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        vy: 2 + Math.random() * 4,
+        vx: (Math.random()-0.5)*2,
+        rot: Math.random()*360,
+        rotV: (Math.random()-0.5)*12
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      pieces.forEach(p => {
+        p.y  += p.vy;
+        p.x  += p.vx;
+        p.rot += p.rotV;
+        if (p.y < canvas.height + 20) alive = true;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      if (alive) requestAnimationFrame(animate);
+    }
+    animate();
+  }
+</script>
+</body>
+</html>
